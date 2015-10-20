@@ -182,7 +182,30 @@ class eBotController {
 
 	public function updateJSON() {
 		$tournament = $this->curl_get_contents("http://api.challonge.com/v1/tournaments/" . $this->challongeInfo['tournamentid'] . ".json?api_key=" . $this->challongeInfo['apikey'] . "&include_participants=1&include_matches=1");
-		return json_decode($tournament);
+		/* Fix for two stage tournaments */
+		$json = json_decode($tournament);
+		$map = [];
+		if ($json->tournament->state == "group_stages_underway") {
+			$numParticipants = count($json->tournament->participants);
+			$firstNum = $json->tournament->matches[0]->match->player1_id; // This player id is seeded no 1.
+			foreach ($json->tournament->matches as $matchRoot) {
+				$match = $matchRoot->match;
+				if (count($map) == $numParticipants) break;
+				$p1 = $match->player1_id-$firstNum;
+				$part1 = $json->tournament->participants[$p1]->participant;
+				$p2 = $match->player2_id-$firstNum;
+				$part2 = $json->tournament->participants[$p2]->participant;
+				$map[$match->player1_id] = $part1->id;
+				$map[$match->player2_id] = $part2->id;
+			}
+			foreach ($json->tournament->matches as $matchRoot) {
+				$match = $matchRoot->match;
+				$match->player1_id = $map[$match->player1_id];
+				$match->player2_id = $map[$match->player2_id];
+			}
+
+		}
+		return $json;
 	}
 
 	public function updateMatch($matchid, $scores_csv, $winnerid) {

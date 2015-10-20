@@ -135,6 +135,8 @@ class eBotController {
 
 			if($value->match->state == "pending") {
 				echo "Matches before have not finished. Skipping...\r\n";
+			} else if ($value->match->state == "complete") {
+				echo "Completed!\r\n";
 			}else{
 				$team1_id = $value->match->player1_id;
 				$team2_id = $value->match->player2_id;

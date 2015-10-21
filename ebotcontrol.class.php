@@ -216,8 +216,8 @@ class eBotController {
 		return json_decode($tournament);
 	}
 
-	public function randomString($length = 10) {
-		$characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	public function randomString($length = 4) {
+		$characters = 'abcdefghijklmnopqrstuvwxyz';
 		$charactersLength = strlen($characters);
 		$randomString = '';
 		for ($i = 0; $i < $length; $i++) {
